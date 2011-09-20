@@ -18,7 +18,7 @@ public class AtomHopperJettyServerBuilder {
         final Server jettyServerReference = new Server(portNumber);
         final ServletContextHandler rootContext = buildRootContext(jettyServerReference);
 
-        final ServletHolder atomHopServer = new ServletHolder(TheRealAtomHopperServlet.class);
+        final ServletHolder atomHopServer = new ServletHolder(new TheRealAtomHopperServlet());
         rootContext.addServlet(atomHopServer, "/*");
 
         return jettyServerReference;
@@ -26,7 +26,10 @@ public class AtomHopperJettyServerBuilder {
 
     private ServletContextHandler buildRootContext(Server serverReference) {
         final ServletContextHandler servletContext = new ServletContextHandler(serverReference, "/");
-
+        
+        servletContext.addEventListener(new AtomHopperContext());
+        servletContext.setInitParameter("powerapi-config-directory", "/home/zinic/installed/etc");
+        
         return servletContext;
     }
 
