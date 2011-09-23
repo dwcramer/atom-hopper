@@ -36,8 +36,7 @@ public class TheRealAtomHopperServlet extends HttpServlet {
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        final Abdera abdera = new Abdera();
-
+        final Abdera abdera = new Abdera(); // This is a great parser
         final Document atomDocument = abdera.getParser().parse(req.getInputStream());
 
         resp.getWriter().write(atomDocument.getRoot().getQName().getLocalPart());

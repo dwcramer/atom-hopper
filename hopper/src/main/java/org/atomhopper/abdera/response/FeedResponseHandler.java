@@ -2,7 +2,6 @@ package org.atomhopper.abdera.response;
 
 import org.atomhopper.abdera.filter.AdapterResponseInterceptor;
 import org.atomhopper.response.AdapterResponse;
-import org.atomhopper.abdera.filter.FeedEntityTagProcessor;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
@@ -42,7 +41,7 @@ public class FeedResponseHandler extends AbstractResponseHandler<Feed> {
 
             case BAD_REQUEST:
                 return ProviderHelper.badrequest(rc, adapterResponse.getMessage());
-                
+
             default:
                 return ProviderHelper.notfound(rc);
         }
