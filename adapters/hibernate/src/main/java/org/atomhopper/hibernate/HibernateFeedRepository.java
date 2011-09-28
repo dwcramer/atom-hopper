@@ -180,9 +180,6 @@ public class HibernateFeedRepository implements FeedRepository {
 
                 feed.getEntries().add(entry);
 
-                liveSession.saveOrUpdate(feed);
-                liveSession.persist(entry);
-
                 // Make sure to update our category objects
                 for (PersistedCategory cat : entry.getCategories()) {
                     PersistedCategory category = (PersistedCategory) liveSession.createCriteria(PersistedCategory.class).add(Restrictions.idEq(cat.getTerm())).uniqueResult();
@@ -194,6 +191,9 @@ public class HibernateFeedRepository implements FeedRepository {
                     category.getFeedEntries().add(entry);
                     liveSession.saveOrUpdate(category);
                 }
+                
+                liveSession.saveOrUpdate(feed);
+                liveSession.persist(entry);
             }
         });
     }
