@@ -1,7 +1,8 @@
 package org.atomhopper.adapter.impl;
 
-import java.util.Calendar;
 import org.apache.abdera.model.Entry;
+
+import java.util.Calendar;
 
 /**
  *
@@ -10,7 +11,7 @@ import org.apache.abdera.model.Entry;
 public class AtomEntry implements Comparable<AtomEntry> {
 
     private final Entry entry;
-    private Calendar updated;
+    private final Calendar updated;
 
     public AtomEntry(Entry entry) {
         this.entry = entry;

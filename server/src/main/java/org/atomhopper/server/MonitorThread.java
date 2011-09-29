@@ -1,22 +1,23 @@
 package org.atomhopper.server;
 
 
+import org.eclipse.jetty.server.Server;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import org.eclipse.jetty.server.Server;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public class MonitorThread extends Thread {
     private static final Logger LOG = LoggerFactory.getLogger(AtomHopperServer.class);
     
     private ServerSocket socket;
-    private Server serverInstance;
-    private final String MONITOR_NAME = "StopMonitor";
+    private final Server serverInstance;
+    private static final String MONITOR_NAME = "StopMonitor";
 
     public MonitorThread(Server serverInstance, final int stopPort, final String ipAddress) {
         this.serverInstance = serverInstance;
@@ -27,7 +28,7 @@ public class MonitorThread extends Thread {
         try {
             socket = new ServerSocket(stopPort, 1, InetAddress.getByName(ipAddress));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOG.error("Fatal error while monitoring or trying to stop: " + e.getMessage(), e);
         }
     }
 
@@ -45,7 +46,7 @@ public class MonitorThread extends Thread {
             accept.close();
             socket.close();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            LOG.error("Fatal error while monitoring or trying to stop: " + e.getMessage(), e);
         }
     }
 }

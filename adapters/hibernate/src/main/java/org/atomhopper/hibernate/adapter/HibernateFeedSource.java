@@ -1,39 +1,40 @@
 package org.atomhopper.hibernate.adapter;
 
-import java.io.StringReader;
-import java.util.List;
-import java.util.Map;
 import org.apache.abdera.Abdera;
-import org.atomhopper.adapter.FeedInformation;
-import org.atomhopper.adapter.FeedSource;
-import org.atomhopper.adapter.request.adapter.GetEntryRequest;
-import org.atomhopper.adapter.request.adapter.GetFeedRequest;
-import org.atomhopper.response.AdapterResponse;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.commons.lang.StringUtils;
+import org.atomhopper.adapter.FeedInformation;
+import org.atomhopper.adapter.FeedSource;
 import org.atomhopper.adapter.ResponseBuilder;
 import org.atomhopper.adapter.jpa.PersistedEntry;
 import org.atomhopper.adapter.jpa.PersistedFeed;
 import org.atomhopper.adapter.request.RequestQueryParameter;
+import org.atomhopper.adapter.request.adapter.GetEntryRequest;
+import org.atomhopper.adapter.request.adapter.GetFeedRequest;
 import org.atomhopper.dbal.FeedRepository;
 import org.atomhopper.dbal.PageDirection;
 import org.atomhopper.hibernate.query.SimpleCategoryCriteriaGenerator;
+import org.atomhopper.response.AdapterResponse;
+
+import java.io.StringReader;
+import java.util.List;
+import java.util.Map;
 
 public class HibernateFeedSource implements FeedSource {
 
+    private static final int PAGE_SIZE = 25;
     private FeedRepository feedRepository;
     private String feedOrder;
 
     public void setFeedRepository(FeedRepository feedRepository) {
         this.feedRepository = feedRepository;
     }
-    
+
     public void setFeedOrder(String feedOrder) {
         this.feedOrder = feedOrder;
-        System.out.println("feedOrder: " + feedOrder);
-    }    
+    }
 
     @Override
     public FeedInformation getFeedInformation() {
@@ -84,9 +85,9 @@ public class HibernateFeedSource implements FeedSource {
 
     @Override
     public AdapterResponse<Feed> getFeed(GetFeedRequest getFeedRequest) {
-        AdapterResponse<Feed> response = ResponseBuilder.notFound();
+        AdapterResponse<Feed> response;
 
-        int pageSize = 25;
+        int pageSize = PAGE_SIZE;
 
         try {
             final String pageSizeString = getFeedRequest.getPageSize();
@@ -125,8 +126,8 @@ public class HibernateFeedSource implements FeedSource {
     }
 
     private AdapterResponse<Feed> getFeedPage(GetFeedRequest getFeedRequest, String marker, int pageSize) {
-        AdapterResponse<Feed> response = ResponseBuilder.notFound();
-        PageDirection pageDirection = null;
+        AdapterResponse<Feed> response;
+        PageDirection pageDirection;
 
         try {
             final String pageDirectionValue = getFeedRequest.getRequestParameter(RequestQueryParameter.PAGE_DIRECTION.toString());

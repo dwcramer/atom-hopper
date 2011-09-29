@@ -7,6 +7,8 @@ import org.apache.abdera.protocol.server.ProviderHelper;
 import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.apache.abdera.util.EntityTag;
+import org.atomhopper.abdera.filter.AdapterResponseInterceptor;
+import org.atomhopper.response.AdapterResponse;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -52,12 +54,6 @@ public class FeedResponseHandler extends AbstractResponseHandler<Feed> {
             return false;
         }
         List<EntityTag> ifNoneMatchList = Arrays.asList(ifNoneMatch);
-        if (ifNoneMatchList.size() != 1) {
-            return false;
-        }
-        if (ifNoneMatchList.get(0).getTag().equals(entityTag.getTag())) {
-            return true;
-        }
-        return false;
+        return ifNoneMatchList.size() == 1 && ifNoneMatchList.get(0).getTag().equals(entityTag.getTag());
     }
 }

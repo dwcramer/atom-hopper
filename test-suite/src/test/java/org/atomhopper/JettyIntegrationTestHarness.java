@@ -13,7 +13,7 @@ import org.junit.BeforeClass;
  */
 public class JettyIntegrationTestHarness {
 
-    public static Server serverInstance;
+    private static Server serverInstance;
 
     @BeforeClass
     public static void startServer() throws Exception {

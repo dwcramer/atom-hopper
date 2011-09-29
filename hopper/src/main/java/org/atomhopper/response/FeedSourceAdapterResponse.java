@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class FeedSourceAdapterResponse<T> implements AdapterResponse<T> {
 
-    public static final HttpStatus DEFAULT_HTTP_STATUS_CODE = HttpStatus.OK;
+    private static final HttpStatus DEFAULT_HTTP_STATUS_CODE = HttpStatus.OK;
 
     private final T responseBody;
     private final HttpStatus statusCode;

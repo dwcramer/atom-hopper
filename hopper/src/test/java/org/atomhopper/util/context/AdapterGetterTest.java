@@ -19,17 +19,17 @@ import static org.mockito.Mockito.*;
 @RunWith(Enclosed.class)
 public class AdapterGetterTest {
 
-    public static final String BAD_REFERENCE = "bean-reference-bad",
-            NULL_REFERENCE = "null-reference",
-            FEED_SOURCE_REFERENCE = "feed-source",
-            FEED_ARCHIVE_REFERENCE = "feed-archive";
+    private static final String BAD_REFERENCE = "bean-reference-bad";
+    private static final String NULL_REFERENCE = "null-reference";
+    private static final String FEED_SOURCE_REFERENCE = "feed-source";
+    public static final String FEED_ARCHIVE_REFERENCE = "feed-archive";
 
     @Ignore
-    public static class InstanceableClass {
+    private static class InstanceableClass {
     }
 
     @Ignore
-    public static abstract class NonInstanceableClass implements FeedSource {
+    private static abstract class NonInstanceableClass implements FeedSource {
     }
 
     @Ignore
@@ -37,7 +37,7 @@ public class AdapterGetterTest {
 
         protected AdapterGetter adapterGetter;
         protected ApplicationContextAdapter contextAdapterMock;
-
+        
         @Before
         public void standUp() {
             contextAdapterMock = mock(ApplicationContextAdapter.class);

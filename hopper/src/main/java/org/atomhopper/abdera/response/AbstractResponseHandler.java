@@ -1,12 +1,13 @@
 package org.atomhopper.abdera.response;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import org.apache.abdera.protocol.server.RequestContext;
 import org.apache.abdera.protocol.server.ResponseContext;
 import org.atomhopper.abdera.filter.AdapterResponseInterceptor;
 import org.atomhopper.response.AdapterResponse;
-import org.apache.abdera.protocol.server.RequestContext;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public abstract class AbstractResponseHandler<T> implements ResponseHandler<T> {
 
@@ -14,7 +15,7 @@ public abstract class AbstractResponseHandler<T> implements ResponseHandler<T> {
     private final String[] allowedMethods;
 
     public AbstractResponseHandler(String[] allowedMethods, AdapterResponseInterceptor<T>... interceptors) {
-        this.allowedMethods = allowedMethods;
+        this.allowedMethods = Arrays.copyOf(allowedMethods, allowedMethods.length);
         responseInterceptors = new LinkedList<AdapterResponseInterceptor<T>>(Arrays.asList(interceptors));
     }
 

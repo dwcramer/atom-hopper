@@ -42,7 +42,7 @@ public final class AtomHopperServlet extends AbderaServlet {
 
     private static final Logger LOG = LoggerFactory.getLogger(AtomHopperServlet.class);
 
-    public static final String DEFAULT_CONFIGURATION_LOCATION = "/etc/atomhopper/atom-server.cfg.xml";
+    private static final String DEFAULT_CONFIGURATION_LOCATION = "/etc/atomhopper/atom-server.cfg.xml";
 
     private final ConfigurationParser<Configuration> configurationParser;
     private ApplicationContextAdapter applicationContextAdapter;
@@ -52,11 +52,6 @@ public final class AtomHopperServlet extends AbderaServlet {
     public AtomHopperServlet() {
         //TODO: One day I'm going to integrate Power API's configuration framework into this but until this, this'll do
         configurationParser = new JAXBConfigurationParser<Configuration>(Configuration.class, org.atomhopper.config.v1_0.ObjectFactory.class);
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
     }
 
     @Override

@@ -1,19 +1,13 @@
 package org.atomhopper.hibernate;
 
-import java.util.List;
-import org.atomhopper.dbal.FeedRepository;
-import org.atomhopper.hibernate.actions.SimpleSessionAction;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
 import org.atomhopper.adapter.jpa.PersistedCategory;
-import org.atomhopper.adapter.jpa.PersistedFeed;
 import org.atomhopper.adapter.jpa.PersistedEntry;
+import org.atomhopper.adapter.jpa.PersistedFeed;
 import org.atomhopper.dbal.AtomDatabaseException;
+import org.atomhopper.dbal.FeedRepository;
 import org.atomhopper.dbal.PageDirection;
 import org.atomhopper.hibernate.actions.ComplexSessionAction;
+import org.atomhopper.hibernate.actions.SimpleSessionAction;
 import org.atomhopper.hibernate.query.CategoryCriteriaGenerator;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -21,9 +15,21 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class HibernateFeedRepository implements FeedRepository {
 
+    private static final Logger LOG = LoggerFactory.getLogger(HibernateFeedRepository.class);
     private final HibernateSessionManager sessionManager;
+    private static final String DATE_LAST_UPDATED = "dateLastUpdated";
 
     public HibernateFeedRepository(Map<String, String> parameters) {
         sessionManager = new HibernateSessionManager(parameters);
@@ -104,15 +110,16 @@ public class HibernateFeedRepository implements FeedRepository {
             public List<PersistedEntry> perform(Session liveSession) {
                 final List<PersistedEntry> feedHead = new LinkedList<PersistedEntry>();
 
-                final Criteria criteria = liveSession.createCriteria(PersistedEntry.class);
+                final Criteria criteria = liveSession.createCriteria(PersistedEntry.class).add(Restrictions.eq("feed.name", feedName));
                 criteriaGenerator.enhanceCriteria(criteria);
                 
                 criteria.setMaxResults(pageSize);
-                if(feedOrder.equalsIgnoreCase("asc"))
-                    criteria.addOrder(Order.asc("dateLastUpdated"));
-                else
-                    criteria.addOrder(Order.desc("dateLastUpdated"));
-
+                if(feedOrder.equalsIgnoreCase("asc")) {
+                    criteria.addOrder(Order.asc(DATE_LAST_UPDATED));
+                } else {
+                    criteria.addOrder(Order.desc(DATE_LAST_UPDATED));
+                }
+                
                 feedHead.addAll(criteria.list());
 
                 return feedHead;
@@ -130,26 +137,27 @@ public class HibernateFeedRepository implements FeedRepository {
 
                 final Criteria criteria = liveSession.createCriteria(PersistedEntry.class);
                 criteriaGenerator.enhanceCriteria(criteria);
-                
+
                 criteria.setMaxResults(pageSize);
-                if(feedOrder.equalsIgnoreCase("asc"))
-                    criteria.addOrder(Order.asc("dateLastUpdated"));
-                else
-                    criteria.addOrder(Order.desc("dateLastUpdated"));
+                if (feedOrder.equalsIgnoreCase("asc")) {
+                    criteria.addOrder(Order.asc(DATE_LAST_UPDATED));
+                } else {
+                    criteria.addOrder(Order.desc(DATE_LAST_UPDATED));
+                }
 
                 switch (direction) {
                     case FORWARD:
-                        criteria.add(Restrictions.gt("dateLastUpdated", markerEntry.getCreationDate()));
+                        criteria.add(Restrictions.gt(DATE_LAST_UPDATED, markerEntry.getCreationDate()));
                         feedPage.add(markerEntry);
-                        feedPage.addAll(criteria.list());
                         break;
 
                     case BACKWARD:
-                        criteria.add(Restrictions.lt("dateLastUpdated", markerEntry.getCreationDate()));
-                        feedPage.addAll(criteria.list());
+                        criteria.add(Restrictions.lt(DATE_LAST_UPDATED, markerEntry.getCreationDate()));
                         break;
                 }
 
+                feedPage.addAll(criteria.list());
+                
                 return feedPage;
             }
         });
@@ -179,17 +187,23 @@ public class HibernateFeedRepository implements FeedRepository {
                 }
 
                 feed.getEntries().add(entry);
+                liveSession.saveOrUpdate(feed);
+                
+                Set<PersistedCategory> categoriesForEntry = new HashSet<PersistedCategory>();
 
                 // Make sure to update our category objects
                 for (PersistedCategory cat : entry.getCategories()) {
-                    PersistedCategory category = (PersistedCategory) liveSession.createCriteria(PersistedCategory.class).add(Restrictions.idEq(cat.getTerm())).uniqueResult();
+                    PersistedCategory category = (PersistedCategory) liveSession.createCriteria(PersistedCategory.class).add(Restrictions.idEq(cat.getTerm().toLowerCase())).uniqueResult();
 
                     if (category == null) {
-                        category = cat;
+                        cat.setTerm(cat.getTerm().toLowerCase());
+                        cat.getFeedEntries().add(entry);
+                        liveSession.save(cat);
+                        categoriesForEntry.add(cat);
+                    } else {
+                        category.setTerm(category.getTerm().toLowerCase());
+                        categoriesForEntry.add(category);
                     }
-
-                    category.getFeedEntries().add(entry);
-                    liveSession.saveOrUpdate(category);
                 }
                 
                 liveSession.saveOrUpdate(feed);

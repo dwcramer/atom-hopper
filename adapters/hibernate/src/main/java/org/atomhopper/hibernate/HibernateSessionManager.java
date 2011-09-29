@@ -1,12 +1,13 @@
 package org.atomhopper.hibernate;
 
-import java.util.Map;
 import org.atomhopper.adapter.jpa.PersistedCategory;
-import org.atomhopper.adapter.jpa.PersistedFeed;
 import org.atomhopper.adapter.jpa.PersistedEntry;
+import org.atomhopper.adapter.jpa.PersistedFeed;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+
+import java.util.Map;
 
 public class HibernateSessionManager {
 
@@ -22,7 +23,7 @@ public class HibernateSessionManager {
                 .addAnnotatedClass(PersistedFeed.class)
                 .addAnnotatedClass(PersistedEntry.class)
                 .addAnnotatedClass(PersistedCategory.class);
-        
+
         for (Map.Entry<String, String> userParameter : parameters.entrySet()) {
             hibernateConfiguration.setProperty(userParameter.getKey(), userParameter.getValue());
         }
